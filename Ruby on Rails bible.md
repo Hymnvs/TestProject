@@ -139,7 +139,13 @@ What we do here is generating a new `article` with the parameters that come from
 
 Notice the `.require` and `.permit`, both of those are security features. With this we will both allow and require the parameters `title` and `text`. We put them into a private method so it can be reused and we dont have to type that stuff out 24/7.
 
-Ruby has some built in things for data validation, they can be added to the `model` source... e.g.:
+#### validation of parameters
+
+We are able to validate model parameters, meaning we can avoid saving useless data into the database or enforce other things.
+
+The validation definition will be done on the `model` level, whilst the actual handling of the validation is done on the `view` level.
+
+Example validation on the `model` level:
 
 ```ruby
 class Article < ApplicationRecord
@@ -148,4 +154,24 @@ class Article < ApplicationRecord
 end
 ```
 
-This validates the `title` and makes sure its filled out and its length is at least 5 characters long.
+This validates the `title` and makes sure its filled out and its length is at least 5 characters long. If a record has been submitted that does not fit these requirements, the form will return false.
+
+Example validation handling on the view level:
+
+```ruby
+<% if @article.errors.any? %>
+  <div id="error_explanation">
+    <h2>
+      <%= pluralize(@article.errors.count, "error") %> prohibited
+      this article from being saved:
+    </h2>
+    <ul>
+      <% @article.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+```
+
+This will display a message to the user explaining what on his input was incorrect.

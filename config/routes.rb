@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   get 'articles/index'
   get 'articles/new'
   get 'articles/show'
+  get 'articles/edit'
 
   root 'welcome#index'
   
