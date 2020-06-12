@@ -44,6 +44,8 @@ You can define a `root` here, which will be the initial starting position of you
 
 One can define `resources` here, a `resource` is basically an object with full CRUD operations. Do this by adding something like `resources :articles` to your routes. 
 
+To get all available `routes` use `rails routes`.
+
 ### resource
 
 A resource needs a controller assigned to it, inside the controller the CRUD statements will be handled. For example to make the `new` available, create a method inside your resource controller that looks like this:
@@ -90,10 +92,60 @@ A view can hold one or multiple `forms`, a form is an interactive GUI element.
 
 Submitting a form send the input to rails in form of parameters, these parameters can and must be referenced inside the controller action events.
 
-Heres an example of how the form gets submitted to the controller:
+Heres an example of how the form gets submitted to the `controller`:
 
 ```
 <ActionController::Parameters {"title"=>"text field input", "text"=>"text area input"} permitted: false>
 ```
 
 ### models
+
+A model seems to be some sort of class for database records. Think of it as a row in a database table.
+
+Keep in mind throughout, classes in `Ruby` must begin with a capital letter, thus we will use `Article` here.
+
+Generate a model via:
+
+```ruby
+rails g model <resourceName> <multiple of attribute:type pairs> 
+
+Example: rails g model Article title:string text:text
+```
+
+This will create files in `app/models` and `db/migrate`. The migrate file is for actually doing the database change, commands like these can be reverted later down the line if needed. More info on `migrations` can be found [here](https://guides.rubyonrails.org/active_record_migrations.html).
+
+The current database we write to is defined in `config/database.yml`.
+
+With the command `rails db:migrate` all database changes will be applied one after the other by their creation time.
+
+Now that the database table has been generated, we need to save the data we get from our previously generated `form`. 
+
+We need to go back into our `controller` and change our `create` binding it to the following:
+
+```ruby
+def create
+  @article = Article.new(article_params)
+  @article.save
+  redirect_to @article
+end
+
+private
+  def article_params
+    params.require(:article).permit(:title, :text)
+  end
+```
+
+What we do here is generating a new `article` with the parameters that come from the `form` and then save them to the database table. `.save` will return a boolean whether it was successful or not.
+
+Notice the `.require` and `.permit`, both of those are security features. With this we will both allow and require the parameters `title` and `text`. We put them into a private method so it can be reused and we dont have to type that stuff out 24/7.
+
+Ruby has some built in things for data validation, they can be added to the `model` source... e.g.:
+
+```ruby
+class Article < ApplicationRecord
+    validates :title, presence: true,
+    length: { minimum: 5 }
+end
+```
+
+This validates the `title` and makes sure its filled out and its length is at least 5 characters long.

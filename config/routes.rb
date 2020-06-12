@@ -7,7 +7,9 @@ Rails.application.routes.draw do
 
   resources :articles
 
+  get 'articles/index'
   get 'articles/new'
+  get 'articles/show'
 
   root 'welcome#index'
   
